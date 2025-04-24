@@ -1,0 +1,75 @@
+{
+  "type": "block",
+  "stmts": [
+    {
+      "type": "decl",
+      "var": "x",
+      "datatype": "int",
+      "value": {
+        "type": "number",
+        "value": "0"
+      }
+    },
+    {
+      "type": "decl",
+      "var": "i",
+      "datatype": "int",
+      "value": {
+        "type": "number",
+        "value": "0"
+      }
+    },
+    {
+      "type": "while",
+      "condition": {
+        "type": "relop",
+        "op": "<",
+        "left": {
+          "type": "id",
+          "value": "i"
+        },
+        "right": {
+          "type": "number",
+          "value": "5"
+        }
+      },
+      "block": {
+        "type": "block",
+        "stmts": [
+          {
+            "type": "assign",
+            "var": "x",
+            "value": {
+              "type": "binop",
+              "op": "+",
+              "left": {
+                "type": "id",
+                "value": "x"
+              },
+              "right": {
+                "type": "number",
+                "value": "1"
+              }
+            }
+          },
+          {
+            "type": "assign",
+            "var": "i",
+            "value": {
+              "type": "binop",
+              "op": "+",
+              "left": {
+                "type": "id",
+                "value": "i"
+              },
+              "right": {
+                "type": "number",
+                "value": "1"
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

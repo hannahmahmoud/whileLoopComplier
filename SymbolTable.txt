@@ -1,0 +1,7 @@
+📘 Symbol Table:
+{
+  "x": "int",
+  "i": "int"
+}
+
+ No semantic errors found.
