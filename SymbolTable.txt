@@ -1,7 +1,9 @@
-📘 Symbol Table:
+Symbol Table:
 {
-  "x": "int",
-  "i": "int"
+  "a": "int",
+  "b": "int",
+  "c": "int",
+  "d": "int"
 }
 
- No semantic errors found.
+No semantic errors found.

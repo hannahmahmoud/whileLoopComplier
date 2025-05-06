@@ -1,0 +1,13 @@
+PROGRAM → BLOCK
+BLOCK → stmt_list
+stmt_list → stmt stmt_list | ε
+stmt → decl | assign | while_stmt | print_stmt
+decl → TYPE ID (ASSIGN expr)? SEMI
+assign → ID ASSIGN expr SEMI
+while_stmt → WHILE LPAREN expr RPAREN block
+block → LBRACE stmt_list RBRACE
+print_stmt → COUT print_args SEMI
+print_args → OUTPUT expr print_args | OUTPUT expr | expr
+expr → term ((OP term)*) | term REL_OP term | term AND term | term OR term
+term → factor ((OP factor)*) | ε
+factor → ID | NUMBER | BOOLEAN | STRING | CHARACTER | LPAREN expr RPAREN
