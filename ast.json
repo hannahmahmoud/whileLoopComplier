@@ -3,102 +3,91 @@
   "stmts": [
     {
       "type": "decl",
-      "var": "a",
+      "var": "i",
       "datatype": "int",
-      "value": {
-        "type": "number",
-        "value": "0"
-      }
-    },
-    {
-      "type": "decl",
-      "var": "b",
-      "datatype": "int",
-      "value": {
-        "type": "number",
-        "value": "0"
-      }
-    },
-    {
-      "type": "decl",
-      "var": "c",
-      "datatype": "int",
-      "value": {
-        "type": "number",
-        "value": "0"
-      }
-    },
-    {
-      "type": "decl",
-      "var": "d",
-      "datatype": "int",
-      "value": {
-        "type": "number",
-        "value": "0"
-      }
-    },
-    {
-      "type": "assign",
-      "var": "c",
-      "value": {
-        "type": "binop",
-        "op": "+",
-        "left": {
-          "type": "id",
-          "value": "a"
-        },
-        "right": {
-          "type": "id",
-          "value": "b"
-        }
-      }
-    },
-    {
-      "type": "assign",
-      "var": "d",
-      "value": {
-        "type": "binop",
-        "op": "+",
-        "left": {
-          "type": "id",
-          "value": "a"
-        },
-        "right": {
-          "type": "id",
-          "value": "b"
-        }
-      }
-    },
-    {
-      "type": "assign",
-      "var": "c",
       "value": {
         "type": "binop",
         "op": "*",
         "left": {
-          "type": "id",
-          "value": "a"
+          "type": "number",
+          "value": "8"
         },
         "right": {
-          "type": "id",
-          "value": "b"
+          "type": "number",
+          "value": "2"
         }
       }
     },
     {
-      "type": "assign",
-      "var": "d",
+      "type": "decl",
+      "var": "limit",
+      "datatype": "int",
       "value": {
-        "type": "binop",
-        "op": "*",
+        "type": "id",
+        "value": "i"
+      }
+    },
+    {
+      "type": "while",
+      "condition": {
+        "type": "relop",
+        "op": "<",
         "left": {
           "type": "id",
-          "value": "a"
+          "value": "i"
         },
         "right": {
-          "type": "id",
-          "value": "b"
+          "type": "number",
+          "value": "10"
         }
+      },
+      "block": {
+        "type": "block",
+        "stmts": [
+          {
+            "type": "decl",
+            "var": "a",
+            "datatype": "int",
+            "value": {
+              "type": "number",
+              "value": "0"
+            }
+          },
+          {
+            "type": "decl",
+            "var": "j",
+            "datatype": "int",
+            "value": {
+              "type": "number",
+              "value": "9"
+            }
+          },
+          {
+            "type": "print",
+            "values": [
+              {
+                "type": "id",
+                "value": "i"
+              }
+            ]
+          },
+          {
+            "type": "assign",
+            "var": "i",
+            "value": {
+              "type": "binop",
+              "op": "+",
+              "left": {
+                "type": "id",
+                "value": "i"
+              },
+              "right": {
+                "type": "number",
+                "value": "1"
+              }
+            }
+          }
+        ]
       }
     }
   ]

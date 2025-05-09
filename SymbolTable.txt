@@ -1,9 +1,9 @@
 Symbol Table:
 {
+  "i": "int",
+  "limit": "int",
   "a": "int",
-  "b": "int",
-  "c": "int",
-  "d": "int"
+  "j": "int"
 }
 
 No semantic errors found.

@@ -1,0 +1,11 @@
+t3 = 16.0
+i = 16.0
+limit = 16.0
+L1:
+t5 = i < 10
+ifFalse t5 goto L2
+print i
+t9 = i + 1
+i = t9
+goto L1
+L2:

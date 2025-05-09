@@ -2,8 +2,13 @@ from lexicalAnalysis import lexer_from_file, lexer_without_declarations
 from parser import parse_tokens_to_ast, save_ast_to_file
 from semanticAnalyser import SemanticAnalyzer
 from TACGenerator import TACGenerator
-from optimizedTAC import TACOptimizer
+from commonSubElmination import commonSubElmination
+from codeMovement import read_tac_from_file,loop_invariant_code_motion,save_tac_to_file
+from constantFolding import constant_folding,save_tac_to_file_1,read_tac_from_file_1
+from constantPropagation import constant_propagation,save_tac_to_file_2,read_tac_from_file_2
+from deadCodeElmination import save_tac_to_file_3, read_tac_from_file_3, dead_code_elimination
 import json
+import os
 
 def main():
     # Read input code
@@ -74,15 +79,56 @@ def main():
                 for line in tac_code:
                     f.write(line + "\n")
             print("TAC generated and saved to TAC.txt")
-
-            # Optimize TAC
-            optimizer = TACOptimizer(
+            
+            # Sub code elmination
+            optimizer = commonSubElmination(
                 "C:\\Users\\User\\Desktop\\AASTMT\\Year 3\\Semester 2\\Projects\\Compliers\\TAC.txt",
-                "C:\\Users\\User\\Desktop\\AASTMT\\Year 3\\Semester 2\\Projects\\Compliers\\optimized_TAC.txt"
+                "C:\\Users\\User\\Desktop\\AASTMT\\Year 3\\Semester 2\\Projects\\Compliers\\subCommonElminationOutput.txt"
             )
             optimizer.optimize_tac()
-            print("Optimized TAC saved to optimized_TAC.txt")
-
+            print("subCodeElimination is  generated and saved to subCommonElminationOutput.txt")
+            
+            # Code Movement
+            input_file = os.path.expanduser("subCommonElminationOutput.txt")
+            output_file = os.path.expanduser("codeMovementOutput.txt")
+            tac = read_tac_from_file(input_file)
+            optimized_tac = loop_invariant_code_motion(tac)
+            save_tac_to_file(optimized_tac, output_file)
+            print(f"\nOptimized TAC saved to: {output_file}")
+            
+            #constant folding 
+            input_fileOfConstantFolding = os.path.expanduser("codeMovementOutput.txt")
+            output_fileConstantFolding = os.path.expanduser("constantFoldingOutput.txt")
+            tac1 = read_tac_from_file_1(input_fileOfConstantFolding)
+            folded_tac = constant_folding(tac1)
+            save_tac_to_file_1(folded_tac, output_fileConstantFolding)
+            print(f"\nFolded TAC saved to: {output_fileConstantFolding}")
+            
+            
+            # constant propagation 
+            input_fileConstantPropagation = os.path.expanduser("constantFoldingOutput.txt")
+            output_fileConstantPropagation = os.path.expanduser("constantPropagationOutput.txt")
+            tac2 = read_tac_from_file_2(input_fileConstantPropagation)
+            optimized_tac = constant_propagation(tac2)
+            save_tac_to_file_2(optimized_tac, output_fileConstantPropagation)
+            print(f"\nOptimized TAC saved to: {output_fileConstantPropagation}")
+            
+            
+            # dead code elemination 
+            input_fileDeadCodeElemination= "constantPropagationOutput.txt"
+            output_fileDeadCodeElemination = "TAC_Optimized.txt"
+            tac3 = read_tac_from_file_3(input_fileDeadCodeElemination)
+            optimized = dead_code_elimination(tac3)
+            save_tac_to_file_3(optimized, output_fileDeadCodeElemination)
+            print(f"\n✅ Optimized TAC saved to: {output_fileDeadCodeElemination}")
+            
+            
+            
+            
+            
+            
+            
+        
         except Exception as e:
             print(f"Error generating TAC: {str(e)}")
             exit(1)

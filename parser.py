@@ -11,7 +11,7 @@ class Parser:
     def match(self, expected_type):
         token_type, token_value = self.current_token()
         if token_type == expected_type:
-            print(f"Match: {expected_type} → '{token_value}'")  # Debugging step
+            print(f"Match: {expected_type} → '{token_value}'")
             self.pos += 1
             return token_value
         else:
@@ -45,10 +45,10 @@ class Parser:
                 'value': {'type': datatype, 'value': default_values.get(datatype, "undefined")}}
 
     def parse_assignment(self):
-        print("Expanding: assign → ID ASSIGN expr SEMI")  # Debugging step
+        print("Expanding: assign → ID ASSIGN expr SEMI")
         var_name = self.match('ID')
         self.match('ASSIGN')
-        expr = self.parse_expr()  # Ensure expressions are parsed correctly
+        expr = self.parse_expr()
         return {'type': 'assign', 'var': var_name, 'value': expr}
 
     def parse_stmt_list(self):
@@ -57,6 +57,19 @@ class Parser:
         while self.pos < len(self.tokens):
             token_type, _ = self.current_token()
 
+            # Handle comments: Skip tokens starting with // until SEMI or RBRACE
+            if token_type == 'OP' and self.pos + 1 < len(self.tokens) and self.tokens[self.pos + 1] == ('OP', '/'):
+                print("Skipping comment: //")
+                self.pos += 2  # Skip the two '/' tokens
+                while self.pos < len(self.tokens):
+                    token_type, _ = self.current_token()
+                    if token_type in ('SEMI', 'RBRACE'):
+                        if token_type == 'SEMI':
+                            self.pos += 1  # Consume the SEMI after a comment
+                        break
+                    self.pos += 1
+                continue
+
             if token_type == 'WHILE':
                 print("Expanding: stmt_list → while_stmt stmt_list")
                 stmt = self.parse_while_stmt()
@@ -64,12 +77,14 @@ class Parser:
             elif token_type in ('TYPE', 'ID', 'COUT'):
                 print("Expanding: stmt_list → stmt stmt_list")
                 stmt = self.parse_stmt()
-
-                # Only match SEMI if the next token isn't a block-ending brace
-                if self.pos < len(self.tokens) and self.current_token()[0] != 'RBRACE':
+                # Match SEMI after the statement, unless it's followed by RBRACE
+                token_type, _ = self.current_token()
+                if token_type == 'SEMI':
                     self.match('SEMI')
-
                 stmts.append(stmt)
+            elif token_type == 'RBRACE':
+                print("Expanding: stmt_list → ε (end of block)")
+                break
             else:
                 print("Expanding: stmt_list → ε (end of statements)")
                 break
@@ -104,21 +119,19 @@ class Parser:
         print("Expanding: while_stmt → WHILE LPAREN expr RPAREN block")
         self.match('WHILE')
         self.match('LPAREN')
-        condition = self.parse_expr()  # Properly parse condition
+        condition = self.parse_expr()
         self.match('RPAREN')
-        block = self.parse_block()  # Ensure statements inside the block are correctly nested
+        block = self.parse_block()
         return {'type': 'while', 'condition': condition, 'block': block}
 
     def parse_print_stmt(self):
         print("Expanding: print_stmt → COUT print_args SEMI")
         self.match('COUT')
-
         values = []
-        while self.current_token()[0] == 'OUTPUT':  # Handle multiple << outputs
+        while self.current_token()[0] == 'OUTPUT':
             self.match('OUTPUT')
             values.append(self.parse_expr())
-
-        self.match('SEMI')  # Ensure statement ends with ;
+        self.match('SEMI')
         return {'type': 'print', 'values': values}
 
     def parse_block(self):
@@ -129,41 +142,38 @@ class Parser:
         return {'type': 'block', 'stmts': stmts}
 
     def parse_increment_decrement(self):
-        print("Expanding: unary_op → ID (INCREMENT | DECREMENT)")  # Debugging
+        print("Expanding: unary_op → ID (INCREMENT | DECREMENT)")
         var_name = self.match('ID')
-        op_type = self.match(self.current_token()[0])  # Match increment/decrement operator
+        op_type = self.match(self.current_token()[0])
         return {'type': 'unary_op', 'op': op_type, 'var': var_name}
 
     def parse_expr(self):
         print("Expanding: expr → term ((OP term)*) | term REL_OP term | expr AND expr | expr OR expr")
         node = self.parse_term()
-
         while True:
             token_type, token_value = self.current_token()
-
-            if token_type == 'REL_OP':  # Relational operators (==, !=, <, >)
+            if token_type == 'REL_OP':
                 print(f"Expanding: expr → term REL_OP term ('{token_value}')")
                 self.match('REL_OP')
                 right = self.parse_term()
                 node = {'type': 'relop', 'op': token_value, 'left': node, 'right': right}
-            elif token_type == 'AND':  # Logical AND (&&)
+            elif token_type == 'AND':
                 print(f"Expanding: expr → expr AND expr ('{token_value}')")
                 self.match('AND')
                 right = self.parse_expr()
                 node = {'type': 'logop', 'op': '&&', 'left': node, 'right': right}
-            elif token_type == 'OR':  # Logical OR (||)
+            elif token_type == 'OR':
                 print(f"Expanding: expr → expr OR expr ('{token_value}')")
                 self.match('OR')
                 right = self.parse_expr()
                 node = {'type': 'logop', 'op': '||', 'left': node, 'right': right}
-            elif token_type == 'OP' and token_value in ('+', '-'):  # Arithmetic operations (+, -)
+            elif token_type == 'OP' and token_value in ('+', '-'):
                 print(f"Expanding: expr → term OP term ('{token_value}')")
                 self.match('OP')
                 right = self.parse_term()
                 node = {'type': 'binop', 'op': token_value, 'left': node, 'right': right}
             else:
                 break
-
         return node
 
     def parse_term(self):
@@ -198,11 +208,30 @@ class Parser:
 def parse_tokens_to_ast(tokens):
     parser = Parser(tokens)
     try:
-        ast = parser.parse()  # Attempt parsing
+        ast = parser.parse()
         return ast
     except SyntaxError as e:
-        print(f"Syntax Error: {e}")  # Print error message
-        return None  # Prevent AST generation if there's an error
+        print(f"Syntax Error: {e}")
+        return None
+
 def save_ast_to_file(ast, filename='ast.json'):
     with open(filename, 'w') as f:
         json.dump(ast, f, indent=2)
+
+# Test the parser with the provided tokens
+tokens = [
+    ('TYPE', 'int'), ('ID', 'i'), ('ASSIGN', '='), ('NUMBER', '0'), ('SEMI', ';'),
+    ('TYPE', 'int'), ('ID', 'limit'), ('ASSIGN', '='), ('NUMBER', '10'), ('SEMI', ';'),
+    ('TYPE', 'int'), ('ID', 'sum'), ('ASSIGN', '='), ('NUMBER', '0'), ('SEMI', ';'),
+    ('WHILE', 'while'), ('LPAREN', '('), ('ID', 'i'), ('REL_OP', '<'), ('ID', 'limit'), ('RPAREN', ')'),
+    ('LBRACE', '{'),
+    ('ID', 'i'), ('INCREMENT', '++'), ('SEMI', ';'),
+    ('OP', '/'), ('OP', '/'), ('ID', 'hi'),
+    ('ID', 'sum'), ('ASSIGN', '='), ('ID', 'sum'), ('OP', '+'), ('ID', 'i'), ('SEMI', ';'),
+    ('OP', '/'), ('OP', '/'), ('ID', 'bye'),
+    ('RBRACE', '}')
+]
+
+ast = parse_tokens_to_ast(tokens)
+if ast:
+    save_ast_to_file(ast)
